@@ -1,0 +1,365 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head></head><body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    
+    
+
+  <div class="border-box-sizing">
+    <div class="container">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&#160;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">We want the ariports location in an X, Y coordinate, we </span>
+<span class="sd">will also have setters and getters to both </span>
+<span class="sd">update the coordinates and add cities to these ariports</span>
+
+<span class="sd">airports will have their x and y coordinates in a tuple like so:</span>
+<span class="sd">  (x,y), but we will have getters and setters anyways to update this</span>
+<span class="sd">[(x,y), (x,y), ...] cities will be placed like this per ariport</span>
+
+<span class="sd">it will also have a function to return a set of the x and y </span>
+<span class="sd">coordinate for whenever it is needed in the plot portions</span>
+
+<span class="sd">also we will allow the airport to hold its sum</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span> <span class="nc">Airport</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xCoord</span><span class="p">,</span> <span class="n">yCoord</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xCoord</span> <span class="o">=</span> <span class="n">xCoord</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yCoord</span> <span class="o">=</span> <span class="n">yCoord</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1">#[city1, city2, ...] </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">getXCoord</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xCoord</span>
+    
+    <span class="k">def</span> <span class="nf">getYCoord</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">yCoord</span>
+
+    <span class="k">def</span> <span class="nf">setXCoord</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newX</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xCoord</span> <span class="o">=</span> <span class="n">newX</span>
+    
+    <span class="k">def</span> <span class="nf">setYCoord</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newY</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yCoord</span> <span class="o">=</span> <span class="n">newY</span>
+
+    <span class="k">def</span> <span class="nf">getCoordSet</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xCoord</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yCoord</span><span class="p">)</span>
+
+    <span class="c1"># takes in a city and updates the sum</span>
+    <span class="k">def</span> <span class="nf">setSum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">city</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sum</span> <span class="o">+=</span> <span class="n">city</span><span class="o">.</span><span class="n">getDistanceToAirport</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">getSum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sum</span>
+
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The city class holds its x and y values and also its distance from its</span>
+<span class="sd">nearest airport</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span> <span class="nc">City</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cityX</span><span class="p">,</span> <span class="n">cityY</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cityX</span> <span class="o">=</span> <span class="n">cityX</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cityY</span> <span class="o">=</span> <span class="n">cityY</span>
+
+    <span class="k">def</span> <span class="nf">getCityX</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cityX</span>
+    
+    <span class="k">def</span> <span class="nf">getCityY</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cityY</span>
+
+    <span class="k">def</span> <span class="nf">getCityCoord</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cityX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cityY</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">setDistanceToAirport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist</span> <span class="o">=</span> <span class="n">dist</span>
+    
+    <span class="k">def</span> <span class="nf">getDistanceToAirport</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span>
+
+
+
+<span class="c1">#finds the airport closest to each city. Once it does, then assign each city to an airport </span>
+<span class="c1"># if they are already assigned, update the distance from each city to its airport</span>
+
+<span class="c1">#airports classes is what is sent if the cities were already assigned to their perspective airports</span>
+<span class="k">def</span> <span class="nf">closestAirports</span><span class="p">(</span><span class="n">cities</span><span class="p">,</span> <span class="n">airports</span><span class="p">,</span> <span class="n">airportsClasses</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">airportsClasses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># when the airports dont have cities assigned to them</span>
+        <span class="n">allAirports</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># loop through each city and keep track of its location</span>
+        <span class="k">for</span> <span class="n">city</span> <span class="ow">in</span> <span class="n">cities</span><span class="p">:</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">newCity</span> <span class="o">=</span> <span class="n">City</span><span class="p">(</span><span class="n">city</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">city</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># makes a city class per new city</span>
+            <span class="n">shortestDistance</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="c1"># since the airports have not been initialized with their classes yet, initialize them on their</span>
+            <span class="c1"># first iteration, also keep track of the shortest distance as we want the airport closest to the city</span>
+            <span class="k">for</span> <span class="n">airport</span> <span class="ow">in</span> <span class="n">airports</span><span class="p">:</span>
+
+                <span class="c1"># makes the airport classes on their first iteration</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">newAirport</span> <span class="o">=</span> <span class="n">Airport</span><span class="p">(</span><span class="n">airport</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">airport</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">allAirports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newAirport</span><span class="p">)</span>
+                
+                <span class="c1"># calculate distance to each airport</span>
+                <span class="n">currentDistance</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">((</span><span class="n">airport</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">newCity</span><span class="o">.</span><span class="n">getCityX</span><span class="p">()),</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="nb">pow</span><span class="p">((</span><span class="n">airport</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">newCity</span><span class="o">.</span><span class="n">getCityY</span><span class="p">()),</span> <span class="mi">2</span><span class="p">)</span>
+
+                <span class="c1"># update the shortest distance</span>
+                <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">shortestDistance</span> <span class="o">=</span> <span class="n">currentDistance</span>
+                <span class="k">elif</span> <span class="n">currentDistance</span> <span class="o">&lt;=</span> <span class="n">shortestDistance</span><span class="p">:</span>
+                    <span class="n">shortestDistance</span> <span class="o">=</span> <span class="n">currentDistance</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="n">j</span>
+                <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1"># after comparing the distance to each airport, save the city to the airport and update the cities distance</span>
+            <span class="n">newCity</span><span class="o">.</span><span class="n">setDistanceToAirport</span><span class="p">(</span><span class="n">shortestDistance</span><span class="p">)</span>
+            <span class="n">allAirports</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newCity</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">allAirports</span>
+  
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="c1"># we just want to update the city distance in each airport</span>
+        <span class="k">for</span> <span class="n">airport</span> <span class="ow">in</span> <span class="n">airportsClasses</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">city</span> <span class="ow">in</span> <span class="n">airport</span><span class="o">.</span><span class="n">cities</span><span class="p">:</span>
+                <span class="n">currentDistance</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">((</span><span class="n">airport</span><span class="o">.</span><span class="n">getXCoord</span><span class="p">()</span> <span class="o">-</span> <span class="n">city</span><span class="o">.</span><span class="n">getCityX</span><span class="p">()),</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="nb">pow</span><span class="p">((</span><span class="n">airport</span><span class="o">.</span><span class="n">getYCoord</span><span class="p">()</span> <span class="o">-</span> <span class="n">city</span><span class="o">.</span><span class="n">getCityY</span><span class="p">()),</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="n">city</span><span class="o">.</span><span class="n">setDistanceToAirport</span><span class="p">(</span><span class="n">currentDistance</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">airportsClasses</span>
+
+
+
+<span class="c1"># the objective function that calculates the total sum for each airport</span>
+<span class="k">def</span> <span class="nf">objectiveFunction</span><span class="p">(</span><span class="n">cityAirports</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">airport</span> <span class="ow">in</span> <span class="n">cityAirports</span><span class="p">:</span>
+        <span class="n">airport</span><span class="o">.</span><span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># gets the total sum per airport by summing all distances calculated</span>
+        <span class="c1"># when searching for each closest city</span>
+        <span class="k">for</span> <span class="n">city</span> <span class="ow">in</span> <span class="n">airport</span><span class="o">.</span><span class="n">cities</span><span class="p">:</span>
+          <span class="n">airport</span><span class="o">.</span><span class="n">setSum</span><span class="p">(</span><span class="n">city</span><span class="p">)</span>
+
+
+
+<span class="c1"># the gradient function that calculates the slope for the x and y axis</span>
+<span class="k">def</span> <span class="nf">gradientFunction</span><span class="p">(</span><span class="n">cityAirports</span><span class="p">):</span>
+
+    <span class="n">alpha</span> <span class="o">=</span> <span class="o">.</span><span class="mi">01</span>
+    <span class="k">for</span> <span class="n">airport</span> <span class="ow">in</span> <span class="n">cityAirports</span><span class="p">:</span>
+        <span class="n">partial</span> <span class="o">=</span> <span class="n">partialFunction</span><span class="p">(</span><span class="n">airport</span><span class="p">)</span> <span class="c1"># for each ariport get the distances for each city x and y coordinates and calculate where to go towards</span>
+        <span class="n">airport</span><span class="o">.</span><span class="n">setXCoord</span><span class="p">(</span><span class="n">airport</span><span class="o">.</span><span class="n">getXCoord</span><span class="p">()</span> <span class="o">-</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">partial</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="c1"># sets the new location for the x axis for the airport (curr x - place needed to go)</span>
+        <span class="n">airport</span><span class="o">.</span><span class="n">setYCoord</span><span class="p">(</span><span class="n">airport</span><span class="o">.</span><span class="n">getYCoord</span><span class="p">()</span> <span class="o">-</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">partial</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+
+
+<span class="c1"># gets the partial sum for each city per airport</span>
+<span class="k">def</span> <span class="nf">partialFunction</span><span class="p">(</span><span class="n">airport</span><span class="p">):</span>
+    <span class="n">xSum</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">ySum</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># calculates the total distance between each city and the current airport location</span>
+    <span class="c1"># to see where it would be best to go</span>
+    <span class="k">for</span> <span class="n">city</span> <span class="ow">in</span> <span class="n">airport</span><span class="o">.</span><span class="n">cities</span><span class="p">:</span>
+        <span class="n">yDistance</span> <span class="o">=</span> <span class="p">(</span><span class="n">airport</span><span class="o">.</span><span class="n">getYCoord</span><span class="p">()</span> <span class="o">-</span> <span class="n">city</span><span class="o">.</span><span class="n">getCityY</span><span class="p">())</span>
+        <span class="n">xDistance</span> <span class="o">=</span> <span class="p">(</span><span class="n">airport</span><span class="o">.</span><span class="n">getXCoord</span><span class="p">()</span> <span class="o">-</span> <span class="n">city</span><span class="o">.</span><span class="n">getCityX</span><span class="p">())</span>
+        <span class="n">xSum</span> <span class="o">+=</span> <span class="n">xDistance</span>
+        <span class="n">ySum</span> <span class="o">+=</span> <span class="n">yDistance</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">xSum</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">ySum</span><span class="p">)</span>
+
+
+
+<span class="c1"># gets the total sum to get the objective sum</span>
+<span class="k">def</span> <span class="nf">getObjectiveSum</span><span class="p">(</span><span class="n">cityAirports</span><span class="p">):</span>
+  <span class="n">objectiveSum</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">for</span> <span class="n">airport</span> <span class="ow">in</span> <span class="n">cityAirports</span><span class="p">:</span>
+    <span class="n">objectiveSum</span> <span class="o">+=</span> <span class="n">airport</span><span class="o">.</span><span class="n">getSum</span><span class="p">()</span>
+  <span class="k">return</span> <span class="n">objectiveSum</span>
+
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+
+
+    <span class="n">num_city</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">num_air</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">num_center</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">cities</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">airports</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">epoch</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">objectiveEpochs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_center</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">xc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">num_city</span><span class="o">//</span><span class="n">num_center</span><span class="p">)</span>
+        <span class="n">yc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">num_city</span><span class="o">//</span><span class="n">num_center</span><span class="p">)</span>
+        <span class="n">cities</span> <span class="o">=</span> <span class="n">cities</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_air</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">airports</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">))</span> 
+
+    <span class="c1"># first print out initial position of the cities</span>
+    <span class="n">zip_cities</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">cities</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">zip_cities</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Cities&#39;</span><span class="p">)</span>
+    <span class="n">zip_airs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">airports</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Initial Position of airports&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">zip_airs</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Airports&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+
+    <span class="n">cityAirports</span> <span class="o">=</span> <span class="n">closestAirports</span><span class="p">(</span><span class="n">cities</span><span class="p">,</span> <span class="n">airports</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="n">objectiveFunction</span><span class="p">(</span><span class="n">cityAirports</span><span class="p">)</span>
+
+    <span class="c1"># Initialize the first data point</span>
+    <span class="n">objectiveEpochs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">epoch</span><span class="p">,</span> <span class="n">getObjectiveSum</span><span class="p">(</span><span class="n">cityAirports</span><span class="p">)))</span>
+    <span class="n">objectiveEpochs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">epoch</span><span class="p">,</span> <span class="n">getObjectiveSum</span><span class="p">(</span><span class="n">cityAirports</span><span class="p">)))</span>
+    <span class="n">hasntEntered</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">while</span> <span class="n">objectiveEpochs</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">objectiveEpochs</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">objectiveEpochs</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">objectiveEpochs</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="n">hasntEntered</span><span class="p">:</span>
+        <span class="n">hasntEntered</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">epoch</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># upon each new iteration, we want to initially upate the cities and airplanes variables as they might now be different</span>
+        <span class="c1"># and we will also plot the points of these updated states if the next update has a greater objective function</span>
+        <span class="n">cities</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">airports</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cityAirports</span><span class="p">)):</span>
+            <span class="n">airportLoc</span> <span class="o">=</span> <span class="n">cityAirports</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">getCoordSet</span><span class="p">()</span>
+            <span class="n">airports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">airportLoc</span><span class="p">)</span>
+            <span class="n">airportCities</span> <span class="o">=</span> <span class="n">cityAirports</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cities</span>
+
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">airportCities</span><span class="p">)):</span>
+                <span class="n">currCity</span> <span class="o">=</span> <span class="n">airportCities</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">getCityCoord</span><span class="p">()</span>
+                <span class="n">cities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">currCity</span><span class="p">)</span>
+
+
+        <span class="c1"># Move the airports closer to the cities</span>
+        <span class="n">gradientFunction</span><span class="p">(</span><span class="n">cityAirports</span><span class="p">)</span>
+        <span class="c1">#again run the closestairports and the objective function to get the updated sums</span>
+        <span class="n">cityAirports</span> <span class="o">=</span> <span class="n">closestAirports</span><span class="p">(</span><span class="n">cities</span><span class="p">,</span> <span class="n">airports</span><span class="p">,</span> <span class="n">cityAirports</span><span class="p">)</span>
+        <span class="n">objectiveFunction</span><span class="p">(</span><span class="n">cityAirports</span><span class="p">)</span>
+        
+        <span class="c1"># Initialize second data point</span>
+        <span class="n">objectiveEpochs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">epoch</span><span class="p">,</span> <span class="n">getObjectiveSum</span><span class="p">(</span><span class="n">cityAirports</span><span class="p">)))</span>
+
+        <span class="c1"># plot the final positions of the airports</span>
+        <span class="k">if</span> <span class="n">objectiveEpochs</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">objectiveEpochs</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">objectiveEpochs</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">objectiveEpochs</span><span class="p">)</span><span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+
+            <span class="c1"># first remake the </span>
+            <span class="n">zip_cities</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">cities</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">zip_cities</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Cities&#39;</span><span class="p">)</span>
+            <span class="n">zip_airs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">airports</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Final Position of airports&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">zip_airs</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Airports&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># finally print the Epoch graph</span>
+    <span class="n">objectiveEpochs</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span> <span class="c1"># want to get rid of the last element as the last element is the epoch that increased</span>
+    <span class="n">zip_objectiveEpochs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">objectiveEpochs</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">zip_objectiveEpochs</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Epoch&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Objective&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Objective Function, total steps taken = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">epoch</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># is -1 because the last position is the one that increases</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea">
+<img src="javascript://"/>
+</div>
+
+</div>
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea">
+<img src="javascript://"/>
+</div>
+
+</div>
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea">
+<img src="javascript://"/>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    </div>
+  </div>
+
+
+ 
+
+
+
+<script type="text/javascript" src="/d2l/common/math/MathML.js?v=20.20.9.24432-155 "></script><script type="text/javascript">document.addEventListener('DOMContentLoaded', function() { D2LMathML.DesktopInit('https://s.brightspace.com/lib/mathjax/2.7.4/MathJax.js?config=MML_HTMLorMML','https://s.brightspace.com/lib/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML','130'); });</script></body></html>
